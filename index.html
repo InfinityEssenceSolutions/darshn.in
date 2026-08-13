@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="Book darshan, order prasad, consult astrologers, explore temples, and plan sacred journeys across India.">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#ea580c">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>Darshn.in - Every Temple. Every Prayer.</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Strict Monochromatic Orange/Saffron Palette */
+            --bg-cream: #fff7ed;
+            --bg-light: #ffedd5;
+            --bg-white: #ffffff;
+            --primary: #f97316;
+            --primary-dark: #ea580c;
+            --primary-darker: #c2410c;
+            --text-dark: #7c2d12; /* Deep burnt orange for text */
+            --text-medium: #9a3412;
+            --text-light: #c2410c;
+            --border-color: #fed7aa;
+            --shadow-sm: 0 2px 8px rgba(194, 65, 12, 0.08);
+            --shadow-md: 0 10px 30px rgba(194, 65, 12, 0.12);
+            --shadow-lg: 0 20px 50px rgba(194, 65, 12, 0.2);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 32px;
+            --radius-full: 999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-cream);
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding-bottom: 90px; /* Space for floating nav */
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.02em; color: var(--text-dark); }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; font-family: inherit; }
+        img { display: block; max-width: 100%; }
+
+        .container { padding: 1.5rem; max-width: 1280px; margin: 0 auto; }
+
+        /* --- Premium Floating Header --- */
+        .pwa-header {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 2rem);
+            max-width: 1200px;
+            background: rgba(255, 247, 237, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-full);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        .logo { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+        .logo-icon { width: 36px; height: 36px; background: var(--primary-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4); }
+        .logo span { color: var(--primary-dark); }
+
+        .desktop-nav { display: none; gap: 2rem; align-items: center; }
+        .desktop-nav a { font-weight: 600; color: var(--text-medium); font-size: 0.95rem; transition: color 0.2s; cursor: pointer; }
+        .desktop-nav a:hover { color: var(--primary-dark); }
+
+        .header-actions { display: flex; gap: 0.75rem; align-items: center; }
+        .icon-btn { width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--bg-light); display: flex; align-items: center; justify-content: center; color: var(--text-dark); transition: background 0.2s; }
+        .icon-btn:hover { background: var(--border-color); }
+        .btn-primary { background: var(--primary-dark); color: white; padding: 0.6rem 1.5rem; border-radius: var(--radius-full); font-weight: 600; font-size: 0.9rem; transition: transform 0.2s; }
+        .btn-primary:hover { transform: translateY(-2px); background: var(--primary-darker); }
+
+        /* --- SPA Views --- */
+        .view { display: none; padding-top: 80px; animation: fadeIn 0.4s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Hero Section --- */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-darker) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius-lg);
+            padding: 3rem 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            color: white;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 237, 213, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 2; }
+        .hero h1 { font-size: 2.5rem; line-height: 1.1; margin-bottom: 1rem; font-weight: 800; color: white; }
+        .hero h1 span { color: #ffedd5; }
+        .hero p { color: rgba(255,255,255,0.8); font-size: 1.1rem; margin-bottom: 2rem; max-width: 500px; }
+
+        .search-box {
+            display: flex; align-items: center; gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            border-radius: var(--radius-full);
+            max-width: 450px; transition: background 0.3s;
+        }
+        .search-box:focus-within { background: rgba(255, 255, 255, 0.25); }
+        .search-box input { border: none; background: transparent; color: white; padding: 0.75rem 0; font-size: 1rem; outline: none; width: 100%; }
+        .search-box input::placeholder { color: rgba(255,255,255,0.7); }
+        .search-box button { background: #fff; color: var(--primary-dark); padding: 0.75rem 1.5rem; border-radius: var(--radius-full); font-weight: 700; white-space: nowrap; transition: transform 0.2s; }
+        .search-box button:hover { transform: scale(1.05); }
+
+        .hero-stats { display: flex; gap: 2rem; margin-top: 2.5rem; }
+        .stat-item h3 { font-size: 1.5rem; font-weight: 800; color: #ffedd5; }
+        .stat-item p { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-top: 0.25rem; }
+
+        .hero-visual { position: relative; height: 300px; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-lg); border: 4px solid rgba(255,255,255,0.1); }
+        .hero-visual img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- Section Headers --- */
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin: 3rem 0 1.5rem; }
+        .section-header h2 { font-size: 1.75rem; font-weight: 700; }
+        .section-header p { color: var(--text-medium); font-size: 0.95rem; margin-top: 0.25rem; }
+        .view-all { color: var(--primary-dark); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer; background: none; }
+
+        /* --- Grids --- */
+        .grid-1 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+        .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+
+        .temple-card { position: relative; height: 360px; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .card:hover .card-img { transform: scale(1.05); }
+        .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(124, 45, 18, 0.9) 0%, transparent 60%); display: flex; flex-direction: column; justify-content: flex-end; padding: 1.5rem; }
+        .card-overlay h3 { color: white; font-size: 1.25rem; margin-bottom: 0.25rem; }
+        .card-overlay p { color: rgba(255, 237, 213, 0.9); font-size: 0.85rem; display: flex; align-items: center; gap: 0.25rem; }
+        .badge { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.9); color: var(--primary-dark); padding: 0.35rem 0.8rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; backdrop-filter: blur(8px); }
+        .live-badge { background: #dc2626; color: white; display: flex; align-items: center; gap: 0.4rem; }
+        .live-badge::before { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* Deity & Festival Cards */
+        .deity-card { position: relative; height: 260px; border-radius: var(--radius-md); overflow: hidden; cursor: pointer; }
+        .deity-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .deity-card:hover img { transform: scale(1.08); }
+        .deity-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(124, 45, 18, 0.85) 0%, transparent 50%); display: flex; flex-direction: column; justify-content: flex-end; padding: 1.25rem; }
+        .deity-overlay h4 { color: white; font-size: 1.2rem; }
+        .deity-overlay p { color: rgba(255, 237, 213, 0.8); font-size: 0.8rem; }
+
+        .festival-card { background: white; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); }
+        .festival-card img { width: 100%; height: 180px; object-fit: cover; }
+        .festival-content { padding: 1.25rem; }
+        .festival-content h4 { font-size: 1.1rem; color: var(--text-dark); }
+        .festival-date { color: var(--primary-dark); font-size: 0.8rem; font-weight: 700; margin: 0.25rem 0 0.5rem; }
+        .festival-content p { color: var(--text-medium); font-size: 0.85rem; }
+
+        /* Devotional Services */
+        .service-card { background: white; border-radius: var(--radius-md); padding: 1.5rem; text-align: center; border: 1px solid var(--border-color); transition: all 0.3s; }
+        .service-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); transform: translateY(-4px); }
+        .service-icon { width: 64px; height: 64px; margin: 0 auto 1rem; background: var(--bg-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .service-card h4 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .service-card p { font-size: 0.85rem; color: var(--text-light); margin-bottom: 0.75rem; }
+        .service-price { color: var(--primary-dark); font-weight: 700; font-size: 0.9rem; }
+
+        /* Directory List */
+        .directory-item { display: flex; align-items: center; gap: 1rem; background: white; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); transition: all 0.2s; cursor: pointer; }
+        .directory-item:hover { border-color: var(--primary); transform: translateX(4px); }
+        .directory-item img { width: 56px; height: 56px; border-radius: var(--radius-sm); object-fit: cover; }
+        .directory-info { flex: 1; }
+        .directory-info h4 { font-size: 1rem; }
+        .directory-info p { font-size: 0.8rem; color: var(--text-light); }
+        .directory-arrow { color: var(--primary-dark); font-size: 1.2rem; }
+
+        /* --- Listing Page --- */
+        .filter-chips { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 1rem; margin-bottom: 1rem; -ms-overflow-style: none; scrollbar-width: none; }
+        .filter-chips::-webkit-scrollbar { display: none; }
+        .chip { background: white; border: 1px solid var(--border-color); padding: 0.6rem 1.25rem; border-radius: var(--radius-full); font-size: 0.9rem; font-weight: 600; color: var(--text-medium); white-space: nowrap; transition: all 0.2s; }
+        .chip.active, .chip:hover { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
+
+        /* --- Detail Page --- */
+        .detail-hero { position: relative; height: 400px; background: var(--primary-darker); overflow: hidden; }
+        .detail-hero img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .detail-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(124,45,18,0.3) 0%, rgba(124,45,18,0.95) 100%); display: flex; flex-direction: column; justify-content: space-between; padding: 2rem 1.5rem; }
+        .back-btn { background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); color: white; padding: 0.6rem 1.25rem; border-radius: var(--radius-full); width: fit-content; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255,255,255,0.3); transition: background 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .detail-title h1 { color: white; font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .detail-title .location { color: rgba(255, 237, 213, 0.9); font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        .detail-body { background: var(--bg-cream); border-radius: var(--radius-lg) var(--radius-lg) 0 0; margin-top: -30px; position: relative; z-index: 10; padding: 2rem 1.5rem; }
+
+        .info-pills { display: flex; gap: 1rem; overflow-x: auto; margin-bottom: 2rem; }
+        .info-pill { background: white; border: 1px solid var(--border-color); padding: 1rem 1.5rem; border-radius: var(--radius-md); min-width: 150px; box-shadow: var(--shadow-sm); }
+        .info-pill span { display: block; font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .info-pill h4 { font-size: 1.1rem; color: var(--text-dark); }
+
+        .tabs { display: flex; gap: 2rem; border-bottom: 2px solid var(--border-color); margin-bottom: 2rem; }
+        .tabs button { background: none; padding: 0.75rem 0; font-weight: 600; color: var(--text-light); border-bottom: 3px solid transparent; font-size: 1rem; margin-bottom: -2px; transition: all 0.2s; }
+        .tabs button.active { color: var(--primary-dark); border-bottom-color: var(--primary-dark); }
+
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        .tab-content p { color: var(--text-medium); margin-bottom: 1rem; line-height: 1.8; }
+
+        /* Gallery & Map */
+        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-top: 1rem; }
+        .gallery-item { border-radius: var(--radius-md); overflow: hidden; height: 150px; cursor: pointer; border: 1px solid var(--border-color); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .gallery-item:hover img { transform: scale(1.1); }
+
+        .map-container { border-radius: var(--radius-md); overflow: hidden; height: 300px; margin-top: 1rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        #map-frame { height: 100%; width: 100%; filter: hue-rotate(10deg) saturate(1.2); }
+
+        /* Floating Mobile Nav */
+        .bottom-nav {
+            position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%);
+            width: calc(100% - 2rem); max-width: 450px;
+            background: rgba(255, 247, 237, 0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color); box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-full); display: flex; justify-content: space-around; padding: 0.5rem; z-index: 999;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-medium); font-size: 0.7rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: var(--radius-full); transition: all 0.2s; background: none; }
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 2px; }
+        .nav-item.active { color: white; background: var(--primary-dark); }
+
+        /* Sticky CTA */
+        .sticky-cta { position: fixed; bottom: 1rem; left: 1rem; right: 1rem; background: white; padding: 1rem; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; gap: 1rem; align-items: center; z-index: 998; border: 1px solid var(--border-color); }
+        .sticky-cta-info h4 { font-size: 1.2rem; color: var(--text-dark); }
+        .sticky-cta-info span { font-size: 0.8rem; color: var(--text-light); }
+        .cta-btn { flex: 1; background: var(--primary-dark); color: white; padding: 1rem; border-radius: var(--radius-md); font-weight: 700; font-size: 1rem; transition: transform 0.2s; }
+        .cta-btn:hover { transform: scale(1.02); background: var(--primary-darker); }
+
+        /* Footer */
+        footer { background: #7c2d12; color: #ffedd5; padding: 4rem 1.5rem 2rem; margin-top: 4rem; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; max-width: 1200px; margin: 0 auto; }
+        .footer-brand h3 { color: white; font-size: 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .footer-brand h3 span { color: #fdba74; }
+        .footer-links h4 { color: white; font-size: 1.1rem; margin-bottom: 1rem; }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 0.75rem; }
+        .footer-links a { color: #fed7aa; transition: color 0.2s; cursor: pointer; }
+        .footer-links a:hover { color: white; }
+        .footer-bottom { text-align: center; padding-top: 2rem; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); max-width: 1200px; margin-left: auto; margin-right: auto; }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .hero { grid-template-columns: 1fr 1fr; align-items: center; padding: 4rem; }
+            .hero h1 { font-size: 3.5rem; }
+            .hero-visual { height: 450px; }
+            .grid-2 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid-4 { grid-template-columns: repeat(4, 1fr); }
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+            .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; }
+        }
+        @media (min-width: 1024px) {
+            .desktop-nav { display: flex; }
+            .bottom-nav { display: none; }
+            body { padding-bottom: 0; }
+            .sticky-cta { position: static; box-shadow: none; border: none; background: transparent; padding: 2rem 0 0; }
+            .cta-btn { max-width: 300px; }
+            .grid-3 { grid-template-columns: repeat(3, 1fr); }
+            .detail-body { padding: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Premium Header -->
+    <header class="pwa-header">
+        <div class="logo" onclick="navigate('home')">
+            <div class="logo-icon">🕉️</div>
+            Darshn<span>.in</span>
+        </div>
+        <nav class="desktop-nav">
+            <a onclick="navigate('home')">Home</a>
+            <a onclick="navigate('listing')">Temples</a>
+            <a onclick="navigate('listing')">Poojas</a>
+            <a onclick="navigate('listing')">Astrology</a>
+        </nav>
+        <div class="header-actions">
+            <button class="icon-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+            </button>
+            <button class="btn-primary">Sign In</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ==========================================
+             VIEW 1: HOME PAGE
+        ========================================== -->
+        <section id="view-home" class="view active">
+            <div class="container">
+                <div class="hero">
+                    <div class="hero-content">
+                        <h1>Every Temple.<br><span>Every Prayer.</span></h1>
+                        <p>Book darshan, order prasad, consult astrologers, and plan sacred journeys across India.</p>
+                        <div class="search-box">
+                            <input type="text" placeholder="Search temples, deities, or festivals...">
+                            <button onclick="navigate('listing')">Explore</button>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat-item"><h3>10K+</h3><p>Temples</p></div>
+                            <div class="stat-item"><h3>500+</h3><p>Pujas</p></div>
+                            <div class="stat-item"><h3>4.9★</h3><p>Rating</p></div>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <img src="./images/temple-architectiure.png" alt="Temple Architecture">
+                    </div>
+                </div>
+
+                <!-- Live Darshan -->
+                <div class="section-header">
+                    <div><h2>Live Darshan</h2><p>Experience divine blessings from anywhere.</p></div>
+                    <button class="view-all">View All →</button>
+                </div>
+                <div class="grid-4">
+                    <div class="card temple-card" style="height: 200px;" onclick="showDetail(1)">
+                        <img src="./images/tirupati-balaji.png" class="card-img" alt="Tirupati">
+                        <div class="card-overlay" style="background: linear-gradient(to top, rgba(124,45,18,0.9) 0%, transparent 50%); padding: 1rem;">
+                            <span class="badge live-badge">LIVE</span>
+                            <h3 style="font-size: 1rem;">Tirupati Balaji</h3>
+                            <p style="font-size: 0.75rem;">12K watching</p>
+                        </div>
+                    </div>
+                    <div class="card temple-card" style="height: 200px;" onclick="showDetail(2)">
+                        <img src="./images/kasi.png" class="card-img" alt="Kashi">
+                        <div class="card-overlay" style="background: linear-gradient(to top, rgba(124,45,18,0.9) 0%, transparent 50%); padding: 1rem;">
+                            <span class="badge live-badge">LIVE</span>
+                            <h3 style="font-size: 1rem;">Kashi Vishwanath</h3>
+                            <p style="font-size: 0.75rem;">8K watching</p>
+                        </div>
+                    </div>
+                    <div class="card temple-card" style="height: 200px;" onclick="showDetail(3)">
+                        <img src="./images/siddhivinayaka.png" class="card-img" alt="Siddhivinayak">
+                        <div class="card-overlay" style="background: linear-gradient(to top, rgba(124,45,18,0.9) 0%, transparent 50%); padding: 1rem;">
+                            <span class="badge live-badge">LIVE</span>
+                            <h3 style="font-size: 1rem;">Siddhivinayak</h3>
+                            <p style="font-size: 0.75rem;">6K watching</p>
+                        </div>
+                    </div>
+                    <div class="card temple-card" style="height: 200px;" onclick="showDetail(4)">
+                        <img src="./images/golden-temple.png" class="card-img" alt="Golden Temple">
+                        <div class="card-overlay" style="background: linear-gradient(to top, rgba(124,45,18,0.9) 0%, transparent 50%); padding: 1rem;">
+                            <span class="badge live-badge">LIVE</span>
+                            <h3 style="font-size: 1rem;">Golden Temple</h3>
+                            <p style="font-size: 0.75rem;">9K watching</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Temples -->
+                <div class="section-header">
+                    <div><h2>Featured Temples</h2><p>Discover sacred destinations across India.</p></div>
+                    <button class="view-all" onclick="navigate('listing')">View All →</button>
+                </div>
+                <div class="grid-3" id="home-temple-grid"></div>
+
+                <!-- Explore Deities -->
+                <div class="section-header">
+                    <div><h2>Explore Deities</h2><p>Connect with divine traditions and sacred stories.</p></div>
+                    <button class="view-all">View All →</button>
+                </div>
+                <div class="grid-3">
+                    <div class="deity-card">
+                        <img src="./images/lord_vishnu.png" alt="Lord Vishnu">
+                        <div class="deity-overlay"><h4>Lord Vishnu</h4><p>Preserver of the universe</p></div>
+                    </div>
+                    <div class="deity-card">
+                        <img src="./images/lord_shiva.png" alt="Lord Shiva">
+                        <div class="deity-overlay"><h4>Lord Shiva</h4><p>The supreme destroyer</p></div>
+                    </div>
+                    <div class="deity-card">
+                        <img src="./images/lakshmi.png" alt="Goddess Lakshmi">
+                        <div class="deity-overlay"><h4>Goddess Lakshmi</h4><p>Goddess of prosperity</p></div>
+                    </div>
+                </div>
+
+                <!-- Festivals -->
+                <div class="section-header">
+                    <div><h2>Upcoming Festivals</h2><p>Celebrate with devotion and joy.</p></div>
+                    <button class="view-all">View All →</button>
+                </div>
+                <div class="grid-3">
+                    <div class="festival-card">
+                        <img src="./images/diwali.png" alt="Diwali">
+                        <div class="festival-content">
+                            <h4>Diwali - Festival of Lights</h4>
+                            <div class="festival-date">OCT 31, 2026</div>
+                            <p>Celebrate the victory of light over darkness with traditional rituals and festivities.</p>
+                        </div>
+                    </div>
+                    <div class="festival-card">
+                        <img src="./images/holi.png" alt="Holi">
+                        <div class="festival-content">
+                            <h4>Holi - Festival of Colors</h4>
+                            <div class="festival-date">MAR 14, 2026</div>
+                            <p>Experience the vibrant celebration of love and spring with colors and joy.</p>
+                        </div>
+                    </div>
+                    <div class="festival-card">
+                        <img src="./images/navratri.png" alt="Navratri">
+                        <div class="festival-content">
+                            <h4>Navratri - Nine Nights</h4>
+                            <div class="festival-date">SEP 27 - OCT 5, 2026</div>
+                            <p>Nine nights of devotion dedicated to the divine feminine energy.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devotional Services -->
+                <div class="section-header">
+                    <div><h2>Devotional Services</h2><p>Bring spirituality into your daily life.</p></div>
+                    <button class="view-all">View All →</button>
+                </div>
+                <div class="grid-3">
+                    <div class="service-card">
+                        <div class="service-icon">🪔</div>
+                        <h4>Daily Puja</h4>
+                        <p>Book daily rituals performed by certified priests</p>
+                        <div class="service-price">Starting ₹299</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">🍱</div>
+                        <h4>Prasad Delivery</h4>
+                        <p>Get blessed prasad delivered to your doorstep</p>
+                        <div class="service-price">Starting ₹199</div>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">🔮</div>
+                        <h4>Astrology Consultation</h4>
+                        <p>Get guidance from Vedic astrologers</p>
+                        <div class="service-price">Starting ₹499</div>
+                    </div>
+                </div>
+
+                <!-- Popular Directory -->
+                <div class="section-header">
+                    <div><h2>Popular Temples</h2><p>Explore our extensive temple directory.</p></div>
+                    <button class="view-all" onclick="navigate('listing')">View All →</button>
+                </div>
+                <div class="grid-2">
+                    <div class="directory-item" onclick="showDetail(1)">
+                        <img src="./images/ranganath.png" alt="Temple">
+                        <div class="directory-info"><h4>Shri Ranganathaswamy</h4><p>Srirangam, Tamil Nadu • Lord Vishnu</p></div>
+                        <span class="directory-arrow">→</span>
+                    </div>
+                    <div class="directory-item" onclick="showDetail(2)">
+                        <img src="./images/somanath.png" alt="Temple">
+                        <div class="directory-info"><h4>Somnath Jyotirlinga</h4><p>Gujarat • Lord Shiva</p></div>
+                        <span class="directory-arrow">→</span>
+                    </div>
+                    <div class="directory-item" onclick="showDetail(3)">
+                        <img src="./images/venkateswara.png" alt="Temple">
+                        <div class="directory-info"><h4>Tirumala Venkateswara</h4><p>Andhra Pradesh • Lord Venkateswara</p></div>
+                        <span class="directory-arrow">→</span>
+                    </div>
+                    <div class="directory-item" onclick="showDetail(4)">
+                        <img src="./images/kedarnath.png" alt="Temple">
+                        <div class="directory-info"><h4>Kedarnath Temple</h4><p>Uttarakhand • Lord Shiva</p></div>
+                        <span class="directory-arrow">→</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 2: TEMPLE LISTING PAGE
+        ========================================== -->
+        <section id="view-listing" class="view">
+            <div class="container">
+                <div class="section-header" style="margin-top: 0;">
+                    <div><h2>Temple Directory</h2><p>Explore sacred places across the subcontinent.</p></div>
+                </div>
+
+                <div class="search-box" style="background: white; border: 1px solid var(--border-color); max-width: 100%; margin-bottom: 1.5rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-light)" stroke-width="2" style="margin-left: 10px;"><path d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+                    <input type="text" id="search-input" onkeyup="filterTemples()" placeholder="Search temples, deities, or locations..." style="color: var(--text-dark);">
+                </div>
+
+                <div class="filter-chips">
+                    <button class="chip active" onclick="filterCategory('All', this)">All Temples</button>
+                    <button class="chip" onclick="filterCategory('Lord Shiva', this)">Lord Shiva</button>
+                    <button class="chip" onclick="filterCategory('Lord Vishnu', this)">Lord Vishnu</button>
+                    <button class="chip" onclick="filterCategory('Lord Krishna', this)">Lord Krishna</button>
+                    <button class="chip" onclick="filterCategory('Goddess', this)">Goddess</button>
+                </div>
+
+                <div class="grid-3" id="listing-temple-grid"></div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 3: TEMPLE DETAIL PAGE
+        ========================================== -->
+        <section id="view-detail" class="view">
+            <div class="detail-hero">
+                <img id="detail-img" src="" alt="Temple Image">
+                <div class="detail-overlay">
+                    <button class="back-btn" onclick="navigate('listing')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        Back
+                    </button>
+                    <div class="detail-title">
+                        <h1 id="detail-title">Temple Name</h1>
+                        <p class="location" id="detail-location">📍 Location, State</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-body">
+                <div class="info-pills">
+                    <div class="info-pill"><span>Primary Deity</span><h4 id="detail-deity">Deity</h4></div>
+                    <div class="info-pill"><span>Best Time</span><h4>Oct - Mar</h4></div>
+                    <div class="info-pill"><span>Entry Fee</span><h4>Free</h4></div>
+                </div>
+
+                <div class="tabs">
+                    <button class="active" onclick="switchTab('overview', this)">Overview</button>
+                    <button onclick="switchTab('gallery', this)">Gallery</button>
+                    <button onclick="switchTab('timings', this)">Timings</button>
+                    <button onclick="switchTab('location', this)">Location</button>
+                </div>
+
+                <div id="tab-overview" class="tab-content active">
+                    <h3>About the Temple</h3>
+                    <p id="detail-desc">This ancient temple stands as a testament to India's rich spiritual heritage. Nestled in breathtaking surroundings, it holds immense religious significance and is visited by millions of devotees each year.</p>
+                    <h3>Spiritual Significance</h3>
+                    <p>The temple is steeped in mythology and cultural heritage. According to ancient scriptures, it is considered one of the holiest abodes of the deity. Pilgrims believe that visiting this sacred shrine cleanses one's soul, brings inner peace, and fulfills heartfelt prayers.</p>
+                </div>
+
+                <div id="tab-gallery" class="tab-content">
+                    <h3>Temple Gallery</h3>
+                    <p>Explore the architecture and divine atmosphere.</p>
+                    <div class="gallery-grid" id="gallery-grid"></div>
+                </div>
+
+                <div id="tab-timings" class="tab-content">
+                    <h3>Darshan Timings</h3>
+                    <div class="info-pills" style="flex-direction: column; gap: 1rem;">
+                        <div class="info-pill" style="display: flex; justify-content: space-between; align-items: center; min-width: 100%;">
+                            <div><span>Morning Darshan</span><h4>05:00 AM - 12:00 PM</h4></div>
+                        </div>
+                        <div class="info-pill" style="display: flex; justify-content: space-between; align-items: center; min-width: 100%;">
+                            <div><span>Afternoon Break</span><h4>12:00 PM - 04:00 PM</h4></div>
+                        </div>
+                        <div class="info-pill" style="display: flex; justify-content: space-between; align-items: center; min-width: 100%;">
+                            <div><span>Evening Darshan</span><h4>04:00 PM - 09:00 PM</h4></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-location" class="tab-content">
+                    <h3>Temple Location</h3>
+                    <p id="detail-address">Address details here.</p>
+                    <div class="map-container">
+                        <iframe id="map-frame" src="" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+
+                <div class="sticky-cta">
+                    <div class="sticky-cta-info">
+                        <span>Starting from</span>
+                        <h4>₹ 501 / person</h4>
+                    </div>
+                    <button class="cta-btn">Book Darshan Now</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Floating Bottom Nav (Mobile) -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="navigate('home')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            Home
+        </button>
+        <button class="nav-item" onclick="navigate('listing')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="3"/><path d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+            Explore
+        </button>
+        <button class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Bookings
+        </button>
+        <button class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+        </button>
+    </nav>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3>🕉️ Darshn<span>.in</span></h3>
+                <p>India's most trusted spiritual platform — connecting devotees with temples, darshan, prasad, and sacred journeys. Every temple, every prayer, at your fingertips.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a onclick="navigate('listing')">Temples Directory</a></li>
+                    <li><a>Book Darshan</a></li>
+                    <li><a>Order Prasad</a></li>
+                    <li><a>Consult Astrologers</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a>Help Center</a></li>
+                    <li><a>Contact Us</a></li>
+                    <li><a>Privacy Policy</a></li>
+                    <li><a>Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Connect</h4>
+                <ul>
+                    <li><a>📧 support@darshn.in</a></li>
+                    <li><a>📞 +91 1800-123-4567</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Darshn.in — Every Temple, Every Prayer. 🙏 All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Mock Database with Gallery & Map Data ---
+        const temples = [
+            {
+                id: 1,
+                name: "Badrinath Temple",
+                location: "Badrinath, Uttarakhand",
+                deity: "Lord Vishnu",
+                img: "./images/badhrinath.png",
+                desc: "Badrinath is one of the holiest Hindu temples, part of the Char Dham pilgrimage. It is dedicated to Lord Vishnu.",
+                mapQuery: "Badrinath Temple, Uttarakhand",
+                gallery: [
+                    "./images/badrinath_1.png",
+                    "./images/badrinath_2.png",
+                    "./images/badhrinath.png"
+                ]
+            },
+            {
+                id: 2,
+                name: "Baidyanath Jyotirlinga",
+                location: "Deoghar, Jharkhand",
+                deity: "Lord Shiva",
+                img: "./images/jyothirlingas.png",
+                desc: "One of the twelve Jyotirlingas in India, Baidyanath Temple is a highly revered site for followers of Hinduism.",
+                mapQuery: "Baidyanath Temple, Deoghar",
+                gallery: [
+                    "./images/jyothirlinga_1.png",
+                    "./images/jyothirlinga_2.png",
+                    "./images/jyothirlinga_3.png"
+                ]
+            },
+            {
+                id: 3,
+                name: "Dwarkadhish Temple",
+                location: "Dwarka, Gujarat",
+                deity: "Lord Krishna",
+                img: "./images/dwarakadish.png",
+                desc: "The Dwarkadhish temple is dedicated to Lord Krishna. It is part of the Char Dham pilgrimage.",
+                mapQuery: "Dwarkadhish Temple, Gujarat",
+                gallery: [
+                    "./images/dwaraka_1.png",
+                    "./images/dwaraka_2.png",
+                    "./images/dwaraka_3.png",
+                ]
+            },
+            {
+                id: 4,
+                name: "Meenakshi Temple",
+                location: "Madurai, Tamil Nadu",
+                deity: "Goddess",
+                img: "./images/meenakshi.png",
+                desc: "A historic Hindu temple known for its stunning Dravidian architecture and towering gopurams.",
+                mapQuery: "Meenakshi Amman Temple, Madurai",
+                gallery: [
+                    "./images/meenakshi_1.png",
+                    "./images/meenakshi_2.png",
+                    "./images/meenakshi_3.png"
+                ]
+            }
+        ];
+
+        let currentFilter = "All";
+
+        // --- SPA Router ---
+        function navigate(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
+            if(viewId === 'home') document.querySelectorAll('.bottom-nav .nav-item')[0].classList.add('active');
+            if(viewId === 'listing') document.querySelectorAll('.bottom-nav .nav-item')[1].classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if(viewId === 'listing') renderListing();
+        }
+
+        // --- Card Generator ---
+        function createTempleCard(temple) {
+            return `
+                <div class="card temple-card" onclick="showDetail(${temple.id})">
+                    <img src="${temple.img}" class="card-img" alt="${temple.name}" loading="lazy">
+                    <div class="card-overlay">
+                        <h3>${temple.name}</h3>
+                        <p>📍 ${temple.location}</p>
+                    </div>
+                    <div class="badge">${temple.deity}</div>
+                </div>
+            `;
+        }
+
+        // --- Render Functions ---
+        function renderHome() {
+            document.getElementById('home-temple-grid').innerHTML = temples.slice(0, 3).map(createTempleCard).join('');
+        }
+
+        function renderListing() {
+            const grid = document.getElementById('listing-temple-grid');
+            const filtered = currentFilter === "All" ? temples : temples.filter(t => t.deity === currentFilter);
+            grid.innerHTML = filtered.map(createTempleCard).join('');
+        }
+
+        function filterCategory(category, btn) {
+            currentFilter = category;
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            renderListing();
+        }
+
+        function filterTemples() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const filtered = temples.filter(t =>
+                t.name.toLowerCase().includes(input) ||
+                t.location.toLowerCase().includes(input) ||
+                t.deity.toLowerCase().includes(input)
+            );
+            document.getElementById('listing-temple-grid').innerHTML = filtered.map(createTempleCard).join('');
+        }
+
+        // --- Detail Page Logic ---
+        function showDetail(id) {
+            const temple = temples.find(t => t.id === id);
+            if(!temple) return;
+
+            document.getElementById('detail-img').src = temple.img;
+            document.getElementById('detail-title').innerText = temple.name;
+            document.getElementById('detail-location').innerText = `📍 ${temple.location}`;
+            document.getElementById('detail-deity').innerText = temple.deity;
+            document.getElementById('detail-desc').innerText = temple.desc;
+            document.getElementById('detail-address').innerText = `${temple.name}, ${temple.location}`;
+
+            // Populate Gallery
+            document.getElementById('gallery-grid').innerHTML = temple.gallery.map(img =>
+                `<div class="gallery-item"><img src="${img}" alt="Gallery"></div>`
+            ).join('');
+
+            // Populate Map (Using Google Maps Embed without API key)
+            const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(temple.mapQuery)}&output=embed`;
+            document.getElementById('map-frame').src = mapSrc;
+
+            navigate('detail');
+            // Reset to overview tab
+            switchTab('overview', document.querySelector('.tabs button'));
+        }
+
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', renderHome);
+
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').catch(err => console.log('SW failed: ', err));
+            });
+        }
+    </script>
+</body>
+</html>
